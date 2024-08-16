@@ -12,7 +12,7 @@ const types = ['Tablet', 'Capsule', 'Syrup', 'Injection', 'Ointment', 'Other'];
 export default function Inventory() {
   const [inventory, setInventory] = useState([]);
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', manufacturer: '', type: '', quantity: '', expiration_date: '' });
+  const [formData, setFormData] = useState({ name: '', manufacturer: '', type: '', quantity: '', expiration_date: '', price: '' });
   const [isEdit, setIsEdit] = useState(false);
   const [editItemId, setEditItemId] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -27,7 +27,7 @@ export default function Inventory() {
     try {
       const response = await api.get('/inventory/');
       if (response.status === 200 && Array.isArray(response.data)) {
-        setInventory(response.data); // Only set if the data is an array
+        setInventory(response.data);
       } else {
         console.error('Unexpected response data:', response.data);
         setSnackbarMessage('Unexpected response format');
@@ -44,7 +44,7 @@ export default function Inventory() {
 
   const handleOpen = () => {
     setIsEdit(false);
-    setFormData({ name: '', manufacturer: '', type: '', quantity: '', expiration_date: '' });
+    setFormData({ name: '', manufacturer: '', type: '', quantity: '', expiration_date: '', price: '' });
     setOpen(true);
   };
 
@@ -55,17 +55,15 @@ export default function Inventory() {
   const handleSave = async () => {
     try {
       if (isEdit) {
-        // Handle edit inventory logic here
         await api.put(`/inventory/${editItemId}`, formData);
         setSnackbarMessage('Inventory item updated successfully!');
       } else {
-        // Handle add inventory logic here
         await api.post('/inventory', formData);
         setSnackbarMessage('Inventory item added successfully!');
       }
       setSnackbarSeverity('success');
-      fetchInventory();
-      handleClose();
+      fetchInventory(); // Refresh the inventory list
+      handleClose(); // Close the dialog
     } catch (error) {
       console.error('Error saving inventory item:', error);
       setSnackbarMessage('An error occurred!');
@@ -78,7 +76,14 @@ export default function Inventory() {
   const handleEdit = (item) => {
     setIsEdit(true);
     setEditItemId(item.id);
-    setFormData({ name: item.name, manufacturer: item.manufacturer, type: item.type, quantity: item.quantity, expiration_date: item.expiration_date });
+    setFormData({
+      name: item.name,
+      manufacturer: item.manufacturer,
+      type: item.type,
+      quantity: item.quantity,
+      expiration_date: item.expiration_date.split('T')[0], // Trim the time portion
+      price: item.price
+    });
     setOpen(true);
   };
 
@@ -87,7 +92,7 @@ export default function Inventory() {
       await api.delete(`/inventory/${id}`);
       setSnackbarMessage('Inventory item deleted successfully!');
       setSnackbarSeverity('success');
-      fetchInventory();
+      fetchInventory(); // Refresh the inventory list
     } catch (error) {
       console.error('Error deleting inventory item:', error);
       setSnackbarMessage('An error occurred!');
@@ -120,6 +125,7 @@ export default function Inventory() {
               <TableCell>Type</TableCell>
               <TableCell>Quantity</TableCell>
               <TableCell>Expiration Date</TableCell>
+              <TableCell>Price (RWF)</TableCell>
               <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
@@ -131,7 +137,8 @@ export default function Inventory() {
                 <TableCell>{item.manufacturer}</TableCell>
                 <TableCell>{item.type}</TableCell>
                 <TableCell>{item.quantity}</TableCell>
-                <TableCell>{item.expiration_date}</TableCell>
+                <TableCell>{item.expiration_date.split('T')[0]}</TableCell>
+                <TableCell>{item.price}</TableCell>
                 <TableCell>
                   <Button variant="contained" color="primary" onClick={() => handleEdit(item)} sx={{ mr: 1 }}>
                     Edit
@@ -145,7 +152,6 @@ export default function Inventory() {
           </TableBody>
         </Table>
       </Paper>
-
       {/* Dialog for Adding/Editing Inventory Items */}
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>{isEdit ? 'Edit Inventory Item' : 'Add Inventory Item'}</DialogTitle>
@@ -201,6 +207,15 @@ export default function Inventory() {
             InputLabelProps={{
               shrink: true,
             }}
+          />
+          <TextField
+            label="Price (RWF)"
+            name="price"
+            value={formData.price}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            type="number"
           />
         </DialogContent>
         <DialogActions>

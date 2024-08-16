@@ -4,7 +4,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem,
   Snackbar, Alert
 } from '@mui/material';
-import api from '../api'; // Import the configured axios instance
+import api from '../Api'; // Import the configured axios instance
 
 const roles = ['Admin', 'Pharmacist', 'Inventory Manager'];
 

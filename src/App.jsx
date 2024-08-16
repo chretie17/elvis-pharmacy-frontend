@@ -1,12 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
-import Login from './pages/login';
-import Dashboard from './admin/dashboard';
+import Login from './pages/Login';
+import Dashboard from './admin/Dashboard';
 import Users from './pages/Users';
 import Inventory from './pages/Inventory';
-import Orders from './pages/Orders';
-import Patients from './pages/Patients';
+import AllOrders from './pages/Orders';
+import AllPatients from './pages/Patients';
 import Pharmacists from './pages/Pharmacists';
 import Financial from './pages/Financial';
 import Compliance from './pages/Compliance';
@@ -64,7 +64,7 @@ function App() {
             element={
               <PrivateRoute>
                 <Layout>
-                  <Orders />
+                  <AllOrders />
                 </Layout>
               </PrivateRoute>
             }
@@ -74,7 +74,7 @@ function App() {
             element={
               <PrivateRoute>
                 <Layout>
-                  <Patients />
+                  <AllPatients />
                 </Layout>
               </PrivateRoute>
             }
@@ -138,18 +138,20 @@ function Layout({ children }) {
 }
 
 function PrivateRoute({ children }) {
-  const { user } = React.useContext(AuthContext);
+  const { user, setUser } = React.useContext(AuthContext);
+  const storedUser = localStorage.getItem('user');
 
-  if (!user) {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      return children; // If user exists in localStorage, allow access
+  React.useEffect(() => {
+    if (!user && storedUser) {
+      setUser(JSON.parse(storedUser));
     }
-    return <Navigate to="/login" />; // Otherwise, redirect to login
+  }, [user, setUser, storedUser]);
+
+  if (!user && !storedUser) {
+    return <Navigate to="/login" />;
   }
 
   return children;
 }
-
 
 export default App;
