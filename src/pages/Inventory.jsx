@@ -12,7 +12,10 @@ const types = ['Tablet', 'Capsule', 'Syrup', 'Injection', 'Ointment', 'Other'];
 export default function Inventory() {
   const [inventory, setInventory] = useState([]);
   const [open, setOpen] = useState(false);
-  const [formData, setFormData] = useState({ name: '', manufacturer: '', type: '', quantity: '', expiration_date: '', price: '' });
+  const [formData, setFormData] = useState({
+    name: '', manufacturer: '', type: '', quantity: '', expiration_date: '', price: '',
+    age_allowed_min: '', age_allowed_max: '', usage_instructions: '', side_effects: '', contraindications: ''
+  });
   const [isEdit, setIsEdit] = useState(false);
   const [editItemId, setEditItemId] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -44,7 +47,10 @@ export default function Inventory() {
 
   const handleOpen = () => {
     setIsEdit(false);
-    setFormData({ name: '', manufacturer: '', type: '', quantity: '', expiration_date: '', price: '' });
+    setFormData({
+      name: '', manufacturer: '', type: '', quantity: '', expiration_date: '', price: '',
+      age_allowed_min: '', age_allowed_max: '', usage_instructions: '', side_effects: '', contraindications: ''
+    });
     setOpen(true);
   };
 
@@ -82,7 +88,12 @@ export default function Inventory() {
       type: item.type,
       quantity: item.quantity,
       expiration_date: item.expiration_date.split('T')[0], // Trim the time portion
-      price: item.price
+      price: item.price,
+      age_allowed_min: item.age_allowed_min || '',
+      age_allowed_max: item.age_allowed_max || '',
+      usage_instructions: item.usage_instructions || '',
+      side_effects: item.side_effects || '',
+      contraindications: item.contraindications || ''
     });
     setOpen(true);
   };
@@ -216,6 +227,54 @@ export default function Inventory() {
             fullWidth
             margin="normal"
             type="number"
+          />
+          <TextField
+            label="Min Age Allowed"
+            name="age_allowed_min"
+            value={formData.age_allowed_min}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            type="number"
+          />
+          <TextField
+            label="Max Age Allowed"
+            name="age_allowed_max"
+            value={formData.age_allowed_max}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            type="number"
+          />
+          <TextField
+            label="Usage Instructions"
+            name="usage_instructions"
+            value={formData.usage_instructions}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            multiline
+            rows={4}
+          />
+          <TextField
+            label="Side Effects"
+            name="side_effects"
+            value={formData.side_effects}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            multiline
+            rows={4}
+          />
+          <TextField
+            label="Contraindications"
+            name="contraindications"
+            value={formData.contraindications}
+            onChange={handleChange}
+            fullWidth
+            margin="normal"
+            multiline
+            rows={4}
           />
         </DialogContent>
         <DialogActions>
