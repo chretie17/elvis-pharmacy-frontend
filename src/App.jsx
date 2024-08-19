@@ -8,8 +8,8 @@ import Users from './pages/Users';
 import Inventory from './pages/Inventory';
 import AllOrders from './pages/Orders';
 import AllPatients from './pages/Patients';
-import Pharmacists from './pages/Pharmacists';
-import Financial from './pages/Financial';
+import AllPharmacists from './pages/Pharmacists';
+import FinancialReport from './pages/Financial';
 import Compliance from './pages/Compliance';
 import PharmacistDashboard from './pages/PharmacyDash';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
@@ -85,7 +85,7 @@ function App() {
             element={
               <PrivateRoute>
                 <Layout>
-                  <Pharmacists />
+                  <AllPharmacists />
                 </Layout>
               </PrivateRoute>
             }
@@ -95,7 +95,7 @@ function App() {
             element={
               <PrivateRoute>
                 <Layout>
-                  <Financial />
+                  <FinancialReport />
                 </Layout>
               </PrivateRoute>
             }

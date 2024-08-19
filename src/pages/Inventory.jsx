@@ -2,12 +2,46 @@ import React, { useState, useEffect } from 'react';
 import {
   Button, Paper, Table, TableHead, TableRow, TableCell, TableBody,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem,
-  Snackbar, Alert
+  Snackbar, Alert, Typography, Box
 } from '@mui/material';
+import { styled } from '@mui/system';
 import api from '../api'; // Import the configured axios instance
 
 // The types available in your system
 const types = ['Tablet', 'Capsule', 'Syrup', 'Injection', 'Ointment', 'Other'];
+
+const Container = styled(Box)(({ theme }) => ({
+  padding: theme?.spacing(3) || '24px',
+  backgroundColor: '#ffffff', // White background
+  minHeight: '100vh',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+}));
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  width: '100%',
+  maxWidth: '900px',
+  marginTop: theme?.spacing(3) || '24px',
+  padding: theme?.spacing(2) || '16px',
+  boxShadow: theme?.shadows?.[3] || '0px 1px 3px rgba(0, 0, 0, 0.2)',
+  borderRadius: '8px',
+  backgroundColor: '#e8f5e9', // Light green background for Paper
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  backgroundColor: '#4CAF50', // Pharmacy green
+  color: '#fff',
+  '&:hover': {
+    backgroundColor: '#388E3C', // Darker green on hover
+  },
+  marginBottom: theme?.spacing(2) || '16px',
+}));
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  color: '#333', // Dark text
+  fontWeight: 'bold',
+}));
 
 export default function Inventory() {
   const [inventory, setInventory] = useState([]);
@@ -122,22 +156,25 @@ export default function Inventory() {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <Button variant="contained" color="primary" onClick={handleOpen} sx={{ mb: 2 }}>
+    <Container>
+      <Typography variant="h4" gutterBottom color="primary" fontWeight="bold">
+        Manage Inventory
+      </Typography>
+      <StyledButton variant="contained" onClick={handleOpen}>
         Add Inventory Item
-      </Button>
-      <Paper>
+      </StyledButton>
+      <StyledPaper>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>Manufacturer</TableCell>
-              <TableCell>Type</TableCell>
-              <TableCell>Quantity</TableCell>
-              <TableCell>Expiration Date</TableCell>
-              <TableCell>Price (RWF)</TableCell>
-              <TableCell>Actions</TableCell>
+              <StyledTableCell>ID</StyledTableCell>
+              <StyledTableCell>Name</StyledTableCell>
+              <StyledTableCell>Manufacturer</StyledTableCell>
+              <StyledTableCell>Type</StyledTableCell>
+              <StyledTableCell>Quantity</StyledTableCell>
+              <StyledTableCell>Expiration Date</StyledTableCell>
+              <StyledTableCell>Price (RWF)</StyledTableCell>
+              <StyledTableCell>Actions</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -151,10 +188,19 @@ export default function Inventory() {
                 <TableCell>{item.expiration_date.split('T')[0]}</TableCell>
                 <TableCell>{item.price}</TableCell>
                 <TableCell>
-                  <Button variant="contained" color="primary" onClick={() => handleEdit(item)} sx={{ mr: 1 }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleEdit(item)}
+                    sx={{ mr: 1 }}
+                  >
                     Edit
                   </Button>
-                  <Button variant="contained" color="secondary" onClick={() => handleDelete(item.id)}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => handleDelete(item.id)}
+                  >
                     Delete
                   </Button>
                 </TableCell>
@@ -162,9 +208,9 @@ export default function Inventory() {
             ))}
           </TableBody>
         </Table>
-      </Paper>
-      {/* Dialog for Adding/Editing Inventory Items */}
-      <Dialog open={open} onClose={handleClose}>
+      </StyledPaper>
+
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
         <DialogTitle>{isEdit ? 'Edit Inventory Item' : 'Add Inventory Item'}</DialogTitle>
         <DialogContent>
           <TextField
@@ -278,12 +324,15 @@ export default function Inventory() {
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="secondary">Cancel</Button>
-          <Button onClick={handleSave} color="primary">{isEdit ? 'Update' : 'Save'}</Button>
+          <Button onClick={handleClose} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleSave} color="primary">
+            {isEdit ? 'Update' : 'Save'}
+          </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
@@ -293,6 +342,6 @@ export default function Inventory() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-    </div>
+    </Container>
   );
 }

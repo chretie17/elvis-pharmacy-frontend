@@ -3,13 +3,41 @@ import {
   Button, Dialog, DialogActions, DialogContent, DialogTitle, 
   TextField, MenuItem, Snackbar, Alert, Autocomplete, 
   Paper, List, ListItem, ListItemText, Typography, Box, IconButton, 
-  DialogContentText 
+  DialogContentText
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import AddIcon from '@mui/icons-material/Add';
 import api from '../api';
+import { styled } from '@mui/system';
+
+const StyledPaper = styled(Paper)({
+  padding: '16px',
+  marginBottom: '32px',
+  backgroundColor: '#f9f9f9',
+  borderRadius: '12px',
+  boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+});
+
+const StyledButton = styled(Button)({
+  backgroundColor: '#28a745',
+  color: '#ffffff',
+  '&:hover': {
+    backgroundColor: '#218838',
+  },
+  padding: '10px 20px',
+  borderRadius: '8px',
+  fontSize: '16px',
+  fontWeight: 'bold',
+});
+
+const StyledIconButton = styled(IconButton)({
+  color: '#007bff',
+  '&:hover': {
+    color: '#0056b3',
+  },
+});
 
 export default function Patients() {
   const [patients, setPatients] = useState([]);
@@ -271,20 +299,18 @@ export default function Patients() {
   };
 
   return (
-    <Box className="max-w-6xl mx-auto p-5 bg-gray-50 rounded-lg shadow-lg">
+    <Box className="max-w-6xl mx-auto p-5 bg-white rounded-lg shadow-lg">
       <Typography variant="h4" className="mb-8 text-center text-green-700 font-bold">
         Patients Management
       </Typography>
-      <Button 
-        variant="contained" 
-        color="primary" 
+      <StyledButton 
         startIcon={<AddIcon />} 
         onClick={handleAddPatientClick} 
-        className="mb-6 bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg shadow-md transition-all"
+        className="mb-6"
       >
         {editingPatient ? 'Update Patient' : 'Add New Patient'}
-      </Button>
-      <Paper className="border border-gray-200 rounded-lg p-4 mb-8 shadow-sm bg-white">
+      </StyledButton>
+      <StyledPaper>
         <List>
           {patients.map((patient) => (
             <ListItem key={patient.id} divider className="hover:bg-green-50 transition-colors flex justify-between items-center">
@@ -294,20 +320,20 @@ export default function Patients() {
                 className="text-gray-600"
               />
               <div className="flex gap-2">
-                <IconButton aria-label="view prescription" onClick={() => handleViewPrescription(patient)}>
+                <StyledIconButton aria-label="view prescription" onClick={() => handleViewPrescription(patient)}>
                   <VisibilityIcon className="text-green-700" />
-                </IconButton>
-                <IconButton aria-label="edit" onClick={() => handleEditPatient(patient)}>
+                </StyledIconButton>
+                <StyledIconButton aria-label="edit" onClick={() => handleEditPatient(patient)}>
                   <EditIcon className="text-blue-700" />
-                </IconButton>
-                <IconButton aria-label="delete" onClick={() => handleDeletePatient(patient.id)}>
+                </StyledIconButton>
+                <StyledIconButton aria-label="delete" onClick={() => handleDeletePatient(patient.id)}>
                   <DeleteIcon className="text-red-700" />
-                </IconButton>
+                </StyledIconButton>
               </div>
             </ListItem>
           ))}
         </List>
-      </Paper>
+      </StyledPaper>
 
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
         <DialogTitle className="bg-green-600 text-white text-lg font-semibold">
@@ -359,14 +385,12 @@ export default function Patients() {
             type="number"
             className="mb-4"
           />
-          <Button 
-            variant="contained" 
-            color="primary" 
+          <StyledButton 
             onClick={handleAddMedicineToPrescription} 
-            className="mb-6 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-md transition-all"
+            className="mb-6"
           >
             Add Medicine to Prescription
-          </Button>
+          </StyledButton>
           <Paper className="border border-gray-200 rounded-lg p-4 mb-8 shadow-sm bg-white">
             <List>
               {prescription.map((item, index) => (
@@ -395,9 +419,9 @@ export default function Patients() {
                     }
                     className="text-gray-600 mt-2"
                   />
-                  <IconButton edge="end" aria-label="delete" onClick={() => handleRemoveMedicineFromPrescription(index)}>
+                  <StyledIconButton edge="end" aria-label="delete" onClick={() => handleRemoveMedicineFromPrescription(index)}>
                     <DeleteIcon className="text-red-500" />
-                  </IconButton>
+                  </StyledIconButton>
                 </ListItem>
               ))}
             </List>
@@ -430,9 +454,9 @@ export default function Patients() {
           <Button onClick={handleClose} color="secondary" className="text-gray-600">
             Cancel
           </Button>
-          <Button onClick={handleAddOrUpdatePatient} color="primary" className="bg-green-600 hover:bg-green-700 text-white">
+          <StyledButton onClick={handleAddOrUpdatePatient} color="primary">
             {editingPatient ? 'Update Patient' : 'Add Patient'}
-          </Button>
+          </StyledButton>
         </DialogActions>
       </Dialog>
 
@@ -475,9 +499,9 @@ export default function Patients() {
           </Paper>
         </DialogContent>
         <DialogActions className="bg-gray-100">
-          <Button onClick={handleClosePrescriptionDialog} color="primary" className="bg-green-600 hover:bg-green-700 text-white">
+          <StyledButton onClick={handleClosePrescriptionDialog} color="primary">
             Close
-          </Button>
+          </StyledButton>
         </DialogActions>
       </Dialog>
 
@@ -499,9 +523,9 @@ export default function Patients() {
           <Button onClick={handleCloseDeleteDialog} color="secondary" className="text-gray-600">
             Cancel
           </Button>
-          <Button onClick={confirmDeletePatient} color="primary" className="bg-red-600 hover:bg-red-700 text-white">
+          <StyledButton onClick={confirmDeletePatient} color="primary" className="bg-red-600 hover:bg-red-700 text-white">
             Confirm Delete
-          </Button>
+          </StyledButton>
         </DialogActions>
       </Dialog>
 

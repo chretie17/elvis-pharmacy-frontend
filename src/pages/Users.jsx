@@ -2,11 +2,45 @@ import React, { useState, useEffect } from 'react';
 import {
   Button, Paper, Table, TableHead, TableRow, TableCell, TableBody,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem,
-  Snackbar, Alert
+  Snackbar, Alert, Typography, Box
 } from '@mui/material';
+import { styled } from '@mui/system';
 import api from '../Api'; // Import the configured axios instance
 
 const roles = ['Admin', 'Pharmacist', 'Inventory Manager'];
+
+const Container = styled(Box)(({ theme }) => ({
+  padding: theme?.spacing(3) || '24px',
+  backgroundColor: '#ffffff', // White background
+  minHeight: '100vh',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+}));
+
+const StyledPaper = styled(Paper)(({ theme }) => ({
+  width: '100%',
+  maxWidth: '900px',
+  marginTop: theme?.spacing(3) || '24px',
+  padding: theme?.spacing(2) || '16px',
+  boxShadow: theme?.shadows?.[3] || '0px 1px 3px rgba(0, 0, 0, 0.2)',
+  borderRadius: '8px',
+  backgroundColor: '#e8f5e9', // Light green background for Paper
+}));
+
+const StyledButton = styled(Button)(({ theme }) => ({
+  backgroundColor: '#4CAF50', // Pharmacy green
+  color: '#fff',
+  '&:hover': {
+    backgroundColor: '#388E3C', // Darker green on hover
+  },
+  marginBottom: theme?.spacing(2) || '16px',
+}));
+
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  color: '#333', // Dark text
+  fontWeight: 'bold',
+}));
 
 export default function Users() {
   const [users, setUsers] = useState([]);
@@ -56,14 +90,12 @@ export default function Users() {
       if (isEdit) {
         await api.put(`/users/${editUserId}`, formData);
         setSnackbarMessage('User updated successfully!');
-        // Update the users state directly
-        setUsers(prevUsers => 
+        setUsers(prevUsers =>
           prevUsers.map(user => user.id === editUserId ? { ...user, ...formData } : user)
         );
       } else {
         const response = await api.post('/users', formData);
         setSnackbarMessage('User added successfully!');
-        // Add the new user to the users state
         setUsers(prevUsers => [...prevUsers, response.data]);
       }
       setSnackbarSeverity('success');
@@ -89,7 +121,6 @@ export default function Users() {
       await api.delete(`/users/${id}`);
       setSnackbarMessage('User deleted successfully!');
       setSnackbarSeverity('success');
-      // Remove the deleted user from the users state
       setUsers(prevUsers => prevUsers.filter(user => user.id !== id));
     } catch (error) {
       console.error('Error deleting user:', error);
@@ -109,19 +140,22 @@ export default function Users() {
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <Button variant="contained" color="primary" onClick={handleOpen} sx={{ mb: 2 }}>
+    <Container>
+      <Typography variant="h4" gutterBottom color="primary" fontWeight="bold">
+        Manage Users
+      </Typography>
+      <StyledButton variant="contained" onClick={handleOpen}>
         Add User
-      </Button>
-      <Paper>
+      </StyledButton>
+      <StyledPaper>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>Username</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Role</TableCell>
-              <TableCell>Actions</TableCell>
+              <StyledTableCell>ID</StyledTableCell>
+              <StyledTableCell>Username</StyledTableCell>
+              <StyledTableCell>Email</StyledTableCell>
+              <StyledTableCell>Role</StyledTableCell>
+              <StyledTableCell>Actions</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -132,10 +166,19 @@ export default function Users() {
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.role}</TableCell>
                 <TableCell>
-                  <Button variant="contained" color="primary" onClick={() => handleEdit(user)} sx={{ mr: 1 }}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => handleEdit(user)}
+                    sx={{ mr: 1 }}
+                  >
                     Edit
                   </Button>
-                  <Button variant="contained" color="secondary" onClick={() => handleDelete(user.id)}>
+                  <Button
+                    variant="contained"
+                    color="secondary"
+                    onClick={() => handleDelete(user.id)}
+                  >
                     Delete
                   </Button>
                 </TableCell>
@@ -143,10 +186,9 @@ export default function Users() {
             ))}
           </TableBody>
         </Table>
-      </Paper>
+      </StyledPaper>
 
-      {/* Dialog for Adding/Editing Users */}
-      <Dialog open={open} onClose={handleClose}>
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
         <DialogTitle>{isEdit ? 'Edit User' : 'Add User'}</DialogTitle>
         <DialogContent>
           <TextField
@@ -193,12 +235,15 @@ export default function Users() {
           </TextField>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="secondary">Cancel</Button>
-          <Button onClick={handleSave} color="primary">{isEdit ? 'Update' : 'Save'}</Button>
+          <Button onClick={handleClose} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleSave} color="primary">
+            {isEdit ? 'Update' : 'Save'}
+          </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for notifications */}
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
@@ -208,6 +253,6 @@ export default function Users() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
-    </div>
+    </Container>
   );
 }
