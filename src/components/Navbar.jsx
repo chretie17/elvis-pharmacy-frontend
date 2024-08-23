@@ -1,33 +1,85 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { AppBar, Toolbar, Typography, IconButton, Avatar, Menu, MenuItem, Box, Badge, Divider, List, ListItem, ListItemText, Tooltip } from '@mui/material';
-import { Notifications, Logout, CheckCircle } from '@mui/icons-material';
+import { AppBar, Toolbar, Typography, IconButton, Avatar, Menu, MenuItem, Box, Badge, List, ListItem, ListItemText, Tooltip, Fade } from '@mui/material';
+import { Notifications, Logout, CheckCircle, AccessTime } from '@mui/icons-material';
 import { AuthContext } from '../contexts/AuthContext';
-import { deepPurple } from '@mui/material/colors';
-import avatarImage from '../assets/man.png'; // Custom avatar from assets folder
-import api from '../api'; // Importing your API instance
+import { styled } from '@mui/material/styles';
+import avatarImage from '../assets/man.png';
+import api from '../api';
+
+const StyledAppBar = styled(AppBar)(({ theme }) => ({
+  backgroundColor: '#004d40',
+  boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+}));
+
+const StyledToolbar = styled(Toolbar)({
+  justifyContent: 'space-between',
+  padding: '0 24px',
+});
+
+const UserInfo = styled(Box)({
+  display: 'flex',
+  alignItems: 'center',
+});
+
+const StyledIconButton = styled(IconButton)(({ theme }) => ({
+  color: '#ffffff',
+  '&:hover': {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+}));
+
+const StyledAvatar = styled(Avatar)(({ theme }) => ({
+  width: theme.spacing(4.5),
+  height: theme.spacing(4.5),
+  border: '2px solid #ffffff',
+}));
+
+const StyledMenu = styled(Menu)(({ theme }) => ({
+  '& .MuiPaper-root': {
+    backgroundColor: '#ffffff',
+    boxShadow: '0px 5px 15px rgba(0, 0, 0, 0.2)',
+    borderRadius: theme.shape.borderRadius,
+  },
+}));
+
+const NotificationList = styled(List)({
+  maxHeight: '400px',
+  overflowY: 'auto',
+  width: '320px',
+});
+
+const NotificationItem = styled(ListItem)(({ theme, isRead }) => ({
+  backgroundColor: isRead ? 'transparent' : 'rgba(0, 77, 64, 0.08)',
+  borderLeft: isRead ? 'none' : '4px solid #004d40',
+  '&:hover': {
+    backgroundColor: 'rgba(0, 77, 64, 0.12)',
+  },
+}));
+
+const LiveClock = () => {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  return (
+    <Typography variant="h6" sx={{ display: 'flex', alignItems: 'center', color: '#ffffff' }}>
+      <AccessTime sx={{ mr: 1 }} />
+      {time.toLocaleTimeString()}
+    </Typography>
+  );
+};
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
-  const [anchorEl, setAnchorEl] = useState(null);
   const [notificationsAnchorEl, setNotificationsAnchorEl] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
-  const handleMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-  };
-
-  const handleNotificationsClick = (event) => {
-    setNotificationsAnchorEl(event.currentTarget);
-  };
-
-  const handleNotificationsClose = () => {
-    setNotificationsAnchorEl(null);
-  };
+  const handleNotificationsClick = (event) => setNotificationsAnchorEl(event.currentTarget);
+  const handleNotificationsClose = () => setNotificationsAnchorEl(null);
 
   const fetchNotifications = async () => {
     try {
@@ -42,7 +94,7 @@ const Navbar = () => {
   const markNotificationAsRead = async (id) => {
     try {
       await api.put(`/notifications/${id}/read`);
-      fetchNotifications(); // Refresh the notification list after marking as read
+      fetchNotifications();
     } catch (error) {
       console.error('Failed to mark notification as read', error);
     }
@@ -50,85 +102,64 @@ const Navbar = () => {
 
   useEffect(() => {
     fetchNotifications();
+    const interval = setInterval(fetchNotifications, 60000); // Refresh every minute
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <AppBar position="fixed" sx={{ zIndex: 1000, backgroundColor: '#004d40', width: '100%' }}>
-      <Toolbar sx={{ justifyContent: 'space-between' }}>
+    <StyledAppBar position="fixed">
+      <StyledToolbar>
         <Typography variant="h6" noWrap component="div" sx={{ fontWeight: 'bold', color: '#ffffff' }}>
         </Typography>
 
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <IconButton color="inherit" onClick={handleNotificationsClick} sx={{ position: 'relative' }}>
+        <LiveClock />
+
+        <UserInfo>
+          <StyledIconButton onClick={handleNotificationsClick}>
             <Badge badgeContent={unreadCount} color="error">
               <Notifications />
             </Badge>
-          </IconButton>
+          </StyledIconButton>
 
-          <IconButton color="inherit" onClick={handleMenuOpen} sx={{ ml: 2 }}>
-            <Avatar
-              sx={{ bgcolor: deepPurple[500] }}
-              alt={user?.name}
-              src={avatarImage} // Use the imported custom avatar
-            >
-              {user?.name?.[0]}
-            </Avatar>
-          </IconButton>
+          <Tooltip title="Logout" arrow>
+            <StyledIconButton onClick={logout} sx={{ ml: 2 }}>
+              <Logout />
+            </StyledIconButton>
+          </Tooltip>
 
-          <Menu
-            anchorEl={anchorEl}
-            open={Boolean(anchorEl)}
-            onClose={handleMenuClose}
-            sx={{ mt: '45px' }}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-          >
-            <MenuItem onClick={logout}>
-              <Logout fontSize="small" sx={{ mr: 1 }} />
-              Logout
-            </MenuItem>
-          </Menu>
+          <StyledAvatar alt={user?.name} src={avatarImage} sx={{ ml: 2 }}>
+            {user?.name?.[0]}
+          </StyledAvatar>
 
-          <Menu
+          <StyledMenu
             anchorEl={notificationsAnchorEl}
             open={Boolean(notificationsAnchorEl)}
             onClose={handleNotificationsClose}
-            sx={{ mt: '45px' }}
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            TransitionComponent={Fade}
           >
-            <Box sx={{ width: '300px', maxHeight: '400px', overflowY: 'auto' }}>
-              <Typography variant="h6" sx={{ p: 2, fontWeight: 'bold' }}>Notifications</Typography>
-              <Divider />
-              <List>
+            <Box sx={{ p: 2 }}>
+              <Typography variant="h6" sx={{ fontWeight: 'bold', color: '#004d40', mb: 1 }}>
+                Notifications
+              </Typography>
+              <NotificationList>
                 {notifications.length === 0 ? (
                   <ListItem>
                     <ListItemText primary="No notifications" />
                   </ListItem>
                 ) : (
                   notifications.map((notification) => (
-                    <ListItem 
+                    <NotificationItem 
                       key={notification.id} 
                       button 
-                      onClick={() => {
-                        markNotificationAsRead(notification.id);
-                        handleNotificationsClose();
-                      }}
-                      sx={{ backgroundColor: notification.is_read ? 'transparent' : '#f5f5f5' }}
+                      isRead={notification.is_read}
+                      onClick={() => markNotificationAsRead(notification.id)}
                     >
-                      <ListItemText primary={notification.message} />
+                      <ListItemText 
+                        primary={notification.message} 
+                        secondary={new Date(notification.created_at).toLocaleString()}
+                      />
                       {!notification.is_read && (
                         <Tooltip title="Mark as read">
                           <IconButton 
@@ -143,15 +174,15 @@ const Navbar = () => {
                           </IconButton>
                         </Tooltip>
                       )}
-                    </ListItem>
+                    </NotificationItem>
                   ))
                 )}
-              </List>
+              </NotificationList>
             </Box>
-          </Menu>
-        </Box>
-      </Toolbar>
-    </AppBar>
+          </StyledMenu>
+        </UserInfo>
+      </StyledToolbar>
+    </StyledAppBar>
   );
 };
 

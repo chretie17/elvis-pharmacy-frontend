@@ -3,7 +3,7 @@ import {
   Button, Dialog, DialogActions, DialogContent, DialogTitle, 
   TextField, MenuItem, Snackbar, Alert, Autocomplete, 
   Paper, List, ListItem, ListItemText, Typography, Box, IconButton, 
-  DialogContentText
+  DialogContentText, Chip
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
@@ -12,31 +12,50 @@ import AddIcon from '@mui/icons-material/Add';
 import api from '../api';
 import { styled } from '@mui/system';
 
+const primaryColor = '#004d40';
+const secondaryColor = '#00796b';
+
 const StyledPaper = styled(Paper)({
-  padding: '16px',
+  padding: '24px',
   marginBottom: '32px',
-  backgroundColor: '#f9f9f9',
+  backgroundColor: '#ffffff',
   borderRadius: '12px',
-  boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
+  boxShadow: '0 4px 20px rgba(0, 77, 64, 0.15)',
 });
 
 const StyledButton = styled(Button)({
-  backgroundColor: '#28a745',
+  backgroundColor: primaryColor,
   color: '#ffffff',
   '&:hover': {
-    backgroundColor: '#218838',
+    backgroundColor: secondaryColor,
   },
-  padding: '10px 20px',
+  padding: '12px 24px',
   borderRadius: '8px',
   fontSize: '16px',
   fontWeight: 'bold',
+  textTransform: 'none',
 });
 
 const StyledIconButton = styled(IconButton)({
-  color: '#007bff',
+  color: primaryColor,
   '&:hover': {
-    color: '#0056b3',
+    backgroundColor: 'rgba(0, 77, 64, 0.08)',
   },
+});
+
+const StyledListItem = styled(ListItem)({
+  borderRadius: '8px',
+  marginBottom: '8px',
+  '&:hover': {
+    backgroundColor: 'rgba(0, 77, 64, 0.05)',
+  },
+});
+
+const StyledChip = styled(Chip)({
+  backgroundColor: 'rgba(0, 77, 64, 0.1)',
+  color: primaryColor,
+  fontWeight: 'bold',
+  margin: '0 4px',
 });
 
 export default function Patients() {
@@ -299,54 +318,64 @@ export default function Patients() {
   };
 
   return (
-    <Box className="max-w-6xl mx-auto p-5 bg-white rounded-lg shadow-lg">
-      <Typography variant="h4" className="mb-8 text-center text-green-700 font-bold">
+    <Box className="max-w-7xl mx-auto p-8 bg-white rounded-lg shadow-xl">
+      <Typography variant="h3" className="mb-8 text-center font-bold" style={{ color: primaryColor }}>
         Patients Management
       </Typography>
       <StyledButton 
         startIcon={<AddIcon />} 
         onClick={handleAddPatientClick} 
-        className="mb-6"
+        className="mb-8"
       >
         {editingPatient ? 'Update Patient' : 'Add New Patient'}
       </StyledButton>
       <StyledPaper>
         <List>
           {patients.map((patient) => (
-            <ListItem key={patient.id} divider className="hover:bg-green-50 transition-colors flex justify-between items-center">
+            <StyledListItem key={patient.id} divider>
               <ListItemText
-                primary={<span className="text-lg font-semibold text-blue-800">{patient.name}</span>}
-                secondary={`National ID: ${patient.national_id} | Insurance: ${patient.insurance_name}`}
-                className="text-gray-600"
+                primary={<span className="text-xl font-semibold" style={{ color: primaryColor }}>{patient.name}</span>}
+                secondary={
+                  <Box>
+                    <Typography variant="body2" className="text-gray-600">National ID: {patient.national_id}</Typography>
+                    <Typography variant="body2" className="text-gray-600">Insurance: {patient.insurance_name}</Typography>
+                    <Box mt={1}>
+                      <StyledChip label={`Total Cost: RWF ${patient.total_cost}`} size="small" />
+                      <StyledChip label={`Final Cost: RWF ${patient.final_cost}`} size="small" />
+                    </Box>
+                  </Box>
+                }
               />
-              <div className="flex gap-2">
+              <Box>
                 <StyledIconButton aria-label="view prescription" onClick={() => handleViewPrescription(patient)}>
-                  <VisibilityIcon className="text-green-700" />
+                  <VisibilityIcon />
                 </StyledIconButton>
                 <StyledIconButton aria-label="edit" onClick={() => handleEditPatient(patient)}>
-                  <EditIcon className="text-blue-700" />
+                  <EditIcon />
                 </StyledIconButton>
                 <StyledIconButton aria-label="delete" onClick={() => handleDeletePatient(patient.id)}>
-                  <DeleteIcon className="text-red-700" />
+                  <DeleteIcon />
                 </StyledIconButton>
-              </div>
-            </ListItem>
+              </Box>
+            </StyledListItem>
           ))}
         </List>
       </StyledPaper>
-
+  
       <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
-        <DialogTitle className="bg-green-600 text-white text-lg font-semibold">
+        <DialogTitle style={{ backgroundColor: primaryColor, color: 'white' }}>
           {editingPatient ? 'Edit Patient' : 'Add New Patient'}
         </DialogTitle>
-        <DialogContent className="bg-gray-50">
+        <DialogContent style={{ backgroundColor: '#f5f5f5' }}>
           <TextField
             label="Patient Name"
             value={name}
             onChange={(e) => setName(e.target.value)}
             fullWidth
             margin="normal"
-            className="mb-4"
+            variant="outlined"
+            InputLabelProps={{ style: { color: primaryColor } }}
+            InputProps={{ style: { color: primaryColor } }}
           />
           <TextField
             label="National ID"
@@ -354,10 +383,12 @@ export default function Patients() {
             onChange={(e) => setNationalId(e.target.value)}
             fullWidth
             margin="normal"
+            variant="outlined"
+            InputLabelProps={{ style: { color: primaryColor } }}
+            InputProps={{ style: { color: primaryColor } }}
             inputProps={{ maxLength: 16 }}
             error={nationalId.length !== 16 && nationalId.length > 0}
             helperText={nationalId.length !== 16 && nationalId.length > 0 ? 'National ID must be 16 characters long' : ''}
-            className="mb-4"
           />
           <TextField
             label="Age"
@@ -366,15 +397,26 @@ export default function Patients() {
             fullWidth
             margin="normal"
             type="number"
-            className="mb-4"
+            variant="outlined"
+            InputLabelProps={{ style: { color: primaryColor } }}
+            InputProps={{ style: { color: primaryColor } }}
           />
           <Autocomplete
             options={inventory}
             getOptionLabel={(option) => option.name}
             value={selectedMedicine}
             onChange={(event, newValue) => setSelectedMedicine(newValue)}
-            renderInput={(params) => <TextField {...params} label="Search Medicine" margin="normal" fullWidth />}
-            className="mb-4"
+            renderInput={(params) => (
+              <TextField 
+                {...params} 
+                label="Search Medicine" 
+                margin="normal" 
+                fullWidth 
+                variant="outlined"
+                InputLabelProps={{ style: { color: primaryColor } }}
+                InputProps={{ ...params.InputProps, style: { color: primaryColor } }}
+              />
+            )}
           />
           <TextField
             label="Quantity"
@@ -383,57 +425,55 @@ export default function Patients() {
             fullWidth
             margin="normal"
             type="number"
-            className="mb-4"
+            variant="outlined"
+            InputLabelProps={{ style: { color: primaryColor } }}
+            InputProps={{ style: { color: primaryColor } }}
           />
           <StyledButton 
             onClick={handleAddMedicineToPrescription} 
-            className="mb-6"
+            style={{ marginTop: '16px', marginBottom: '16px' }}
           >
             Add Medicine to Prescription
           </StyledButton>
-          <Paper className="border border-gray-200 rounded-lg p-4 mb-8 shadow-sm bg-white">
+          
+          <Typography variant="h6" style={{ color: primaryColor, marginTop: '16px', marginBottom: '8px' }}>
+            Prescription
+          </Typography>
+          <Paper style={{ padding: '16px', marginBottom: '16px', backgroundColor: 'white' }}>
             <List>
               {prescription.map((item, index) => (
-                <ListItem key={index} className="hover:bg-green-50 transition-colors">
+                <ListItem key={index} style={{ borderBottom: '1px solid #e0e0e0', paddingBottom: '8px' }}>
                   <ListItemText
-                    primary={`${item.name} - ${item.quantity} pcs`}
-                    secondary={`Manufacturer: ${item.manufacturer} | Type: ${item.type} | Expiration Date: ${item.expiration_date} | Price: RWF ${item.price * item.quantity}`}
-                    className="text-gray-600"
-                  />
-                  <ListItemText
+                    primary={<span style={{ color: primaryColor, fontWeight: 'bold' }}>{item.name} - {item.quantity} pcs</span>}
                     secondary={
                       <>
-                        <Typography variant="body2" className="text-gray-700">
-                          Age Allowed: {item.age_allowed_min} - {item.age_allowed_max} years
-                        </Typography>
-                        <Typography variant="body2" className="text-gray-700">
-                          Usage Instructions: {item.usage_instructions}
-                        </Typography>
-                        <Typography variant="body2" className="text-gray-700">
-                          Side Effects: {item.side_effects}
-                        </Typography>
-                        <Typography variant="body2" className="text-gray-700">
-                          Contraindications: {item.contraindications}
-                        </Typography>
+                        <Typography variant="body2">Manufacturer: {item.manufacturer} | Type: {item.type}</Typography>
+                        <Typography variant="body2">Expiration Date: {item.expiration_date}</Typography>
+                        <Typography variant="body2">Price: RWF {item.price * item.quantity}</Typography>
+                        <Typography variant="body2">Age Allowed: {item.age_allowed_min} - {item.age_allowed_max} years</Typography>
+                        <Typography variant="body2">Usage Instructions: {item.usage_instructions}</Typography>
+                        <Typography variant="body2">Side Effects: {item.side_effects}</Typography>
+                        <Typography variant="body2">Contraindications: {item.contraindications}</Typography>
                       </>
                     }
-                    className="text-gray-600 mt-2"
                   />
                   <StyledIconButton edge="end" aria-label="delete" onClick={() => handleRemoveMedicineFromPrescription(index)}>
-                    <DeleteIcon className="text-red-500" />
+                    <DeleteIcon />
                   </StyledIconButton>
                 </ListItem>
               ))}
             </List>
           </Paper>
-          <div className="flex justify-between items-center mb-6">
-            <Typography variant="h6" className="text-gray-700 font-semibold">
+          
+          <Box display="flex" justifyContent="space-between" marginBottom="16px">
+            <Typography variant="h6" style={{ color: primaryColor }}>
               Total Cost: RWF {typeof totalCost === 'number' ? totalCost.toFixed(2) : '0.00'}
             </Typography>
-            <Typography variant="h6" className="text-gray-700 font-semibold">
-              Final Cost (after insurance): RWF {typeof finalCost === 'number' ? finalCost.toFixed(2) : '0.00'}
+            <Typography variant="h6" style={{ color: primaryColor }}>
+              Final Cost: RWF {typeof finalCost === 'number' ? finalCost.toFixed(2) : '0.00'}
             </Typography>
-          </div>
+          </Box>
+          
           <TextField
             select
             label="Select Insurance"
@@ -441,104 +481,95 @@ export default function Patients() {
             onChange={handleInsuranceChange}
             fullWidth
             margin="normal"
-            className="mb-4"
+            variant="outlined"
+            InputLabelProps={{ style: { color: primaryColor } }}
+            InputProps={{ style: { color: primaryColor } }}
           >
             {insurances.map((insurance) => (
-              <MenuItem key={insurance.id} value={insurance.id} className="text-gray-700">
+              <MenuItem key={insurance.id} value={insurance.id}>
                 {insurance.name}
               </MenuItem>
             ))}
           </TextField>
         </DialogContent>
-        <DialogActions className="bg-gray-100">
-          <Button onClick={handleClose} color="secondary" className="text-gray-600">
+        <DialogActions style={{ backgroundColor: '#f5f5f5' }}>
+          <Button onClick={handleClose} style={{ color: primaryColor }}>
             Cancel
           </Button>
-          <StyledButton onClick={handleAddOrUpdatePatient} color="primary">
+          <StyledButton onClick={handleAddOrUpdatePatient}>
             {editingPatient ? 'Update Patient' : 'Add Patient'}
           </StyledButton>
         </DialogActions>
       </Dialog>
-
+  
       <Dialog open={openPrescriptionDialog} onClose={handleClosePrescriptionDialog} maxWidth="sm" fullWidth>
-        <DialogTitle className="bg-green-600 text-white text-lg font-semibold">
+        <DialogTitle style={{ backgroundColor: primaryColor, color: 'white' }}>
           Prescription Details
         </DialogTitle>
-        <DialogContent className="bg-gray-50">
-          <Paper className="border border-gray-200 rounded-lg p-4 shadow-sm bg-white">
+        <DialogContent style={{ backgroundColor: '#f5f5f5' }}>
+          <Paper style={{ padding: '16px', marginTop: '16px', backgroundColor: 'white' }}>
             <List>
               {currentPrescription.map((item, index) => (
-                <ListItem key={index} className="hover:bg-green-50 transition-colors">
+                <ListItem key={index} style={{ borderBottom: '1px solid #e0e0e0', paddingBottom: '8px' }}>
                   <ListItemText
-                    primary={`${item.name} - ${item.quantity} pcs`}
-                    secondary={`Manufacturer: ${item.manufacturer} | Type: ${item.type} | Expiration Date: ${item.expiration_date} | Price: RWF ${item.price * item.quantity}`}
-                    className="text-gray-600"
-                  />
-                  <ListItemText
+                    primary={<span style={{ color: primaryColor, fontWeight: 'bold' }}>{item.name} - {item.quantity} pcs</span>}
                     secondary={
                       <>
-                        <Typography variant="body2" className="text-gray-700">
-                          Age Allowed: {item.age_allowed_min} - {item.age_allowed_max} years
-                        </Typography>
-                        <Typography variant="body2" className="text-gray-700">
-                          Usage Instructions: {item.usage_instructions}
-                        </Typography>
-                        <Typography variant="body2" className="text-gray-700">
-                          Side Effects: {item.side_effects}
-                        </Typography>
-                        <Typography variant="body2" className="text-gray-700">
-                          Contraindications: {item.contraindications}
-                        </Typography>
+                        <Typography variant="body2">Manufacturer: {item.manufacturer} | Type: {item.type}</Typography>
+                        <Typography variant="body2">Expiration Date: {item.expiration_date}</Typography>
+                        <Typography variant="body2">Price: RWF {item.price * item.quantity}</Typography>
+                        <Typography variant="body2">Age Allowed: {item.age_allowed_min} - {item.age_allowed_max} years</Typography>
+                        <Typography variant="body2">Usage Instructions: {item.usage_instructions}</Typography>
+                        <Typography variant="body2">Side Effects: {item.side_effects}</Typography>
+                        <Typography variant="body2">Contraindications: {item.contraindications}</Typography>
                       </>
                     }
-                    className="text-gray-600 mt-2"
                   />
                 </ListItem>
               ))}
             </List>
           </Paper>
         </DialogContent>
-        <DialogActions className="bg-gray-100">
-          <StyledButton onClick={handleClosePrescriptionDialog} color="primary">
+        <DialogActions style={{ backgroundColor: '#f5f5f5' }}>
+          <StyledButton onClick={handleClosePrescriptionDialog}>
             Close
           </StyledButton>
         </DialogActions>
       </Dialog>
-
+  
       <Dialog
         open={confirmDeleteDialogOpen}
         onClose={handleCloseDeleteDialog}
         maxWidth="sm"
         fullWidth
       >
-        <DialogTitle className="bg-red-600 text-white text-lg font-semibold">
+        <DialogTitle style={{ backgroundColor: primaryColor, color: 'white' }}>
           Confirm Deletion
         </DialogTitle>
-        <DialogContent className="bg-gray-50">
-          <DialogContentText className="text-gray-700">
+        <DialogContent style={{ backgroundColor: '#f5f5f5', marginTop: '16px' }}>
+          <DialogContentText>
             Are you sure you want to delete this patient? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
-        <DialogActions className="bg-gray-100">
-          <Button onClick={handleCloseDeleteDialog} color="secondary" className="text-gray-600">
+        <DialogActions style={{ backgroundColor: '#f5f5f5' }}>
+          <Button onClick={handleCloseDeleteDialog} style={{ color: primaryColor }}>
             Cancel
           </Button>
-          <StyledButton onClick={confirmDeletePatient} color="primary" className="bg-red-600 hover:bg-red-700 text-white">
+          <StyledButton onClick={confirmDeletePatient} style={{ backgroundColor: '#d32f2f' }}>
             Confirm Delete
           </StyledButton>
         </DialogActions>
       </Dialog>
-
+  
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
         onClose={() => setSnackbarOpen(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert severity={snackbarSeverity} className="w-full">
+        <Alert severity={snackbarSeverity} style={{ backgroundColor: primaryColor, color: 'white' }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>
     </Box>
-  );
-}
+)};

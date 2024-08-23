@@ -1,14 +1,95 @@
 import React, { useContext, useState } from 'react';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Box, Collapse, IconButton } from '@mui/material';
-import { Dashboard, People, Inventory, LocalPharmacy, Assignment, AccountBalance, Gavel, ShoppingCart, ChevronLeft as ChevronLeftIcon, ChevronRight as ChevronRightIcon } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import { 
+  Drawer, 
+  List, 
+  ListItem, 
+  ListItemIcon, 
+  ListItemText, 
+  Box, 
+  Collapse, 
+  IconButton, 
+  Typography 
+} from '@mui/material';
+import { 
+  Dashboard, 
+  People, 
+  Inventory, 
+  LocalPharmacy, 
+  Assignment, 
+  AccountBalance, 
+  Gavel, 
+  ShoppingCart, 
+  ChevronLeft as ChevronLeftIcon, 
+  ChevronRight as ChevronRightIcon 
+} from '@mui/icons-material';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { AuthContext } from '../contexts/AuthContext';
-import { styled } from '@mui/system';
+import { styled, useTheme } from '@mui/material/styles';
+import logo from '../assets/pharamcy.jpg';
+
+const drawerWidth = 280;
+
+const StyledDrawer = styled(Drawer, { shouldForwardProp: (prop) => prop !== 'open' })(
+  ({ theme, open }) => ({
+    width: open ? drawerWidth : theme.spacing(9),
+    flexShrink: 0,
+    whiteSpace: 'nowrap',
+    boxSizing: 'border-box',
+    overflowX: 'hidden',
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+    '& .MuiDrawer-paper': {
+      width: open ? drawerWidth : theme.spacing(9),
+      backgroundColor: '#004d40',
+      color: '#ffffff',
+      overflowX: 'hidden',
+      transition: theme.transitions.create('width', {
+        easing: theme.transitions.easing.sharp,
+        duration: theme.transitions.duration.enteringScreen,
+      }),
+    },
+  })
+);
+
+const StyledListItem = styled(ListItem)(({ theme, active }) => ({
+  margin: theme.spacing(0.5, 1),
+  borderRadius: theme.shape.borderRadius,
+  backgroundColor: active ? 'rgba(255, 255, 255, 0.12)' : 'transparent',
+  '&:hover': {
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
+  },
+}));
+
+const StyledListItemIcon = styled(ListItemIcon)(({ theme }) => ({
+  color: '#ffffff',
+  minWidth: theme.spacing(5),
+}));
+
+const StyledListItemText = styled(ListItemText)(({ theme }) => ({
+  '& .MuiListItemText-primary': {
+    fontWeight: 'bold',
+    fontSize: '0.95rem',
+  },
+}));
+
+const Logo = styled('img')(({ theme }) => ({
+  width: theme.spacing(7),
+  height: theme.spacing(7),
+  margin: theme.spacing(2, 'auto'),
+  borderRadius: '50%',
+  border: '2px solid #ffffff',
+  padding: theme.spacing(1),
+  backgroundColor: '#ffffff',
+}));
 
 const Sidebar = () => {
+  const theme = useTheme();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useContext(AuthContext);
-  const [open, setOpen] = useState(true); // For collapsing the sidebar
+  const [open, setOpen] = useState(true);
 
   const handleToggle = () => {
     setOpen(!open);
@@ -50,59 +131,46 @@ const Sidebar = () => {
   }
 
   return (
-    <Drawer
-      variant="permanent"
-      sx={{
-        width: open ? 240 : 70,
-        flexShrink: 0,
-        zIndex: 1200,
-        overflowX: 'hidden',
-        transition: 'width 0.3s ease-in-out',
-        [`& .MuiDrawer-paper`]: {
-          width: open ? 240 : 70,
-          boxSizing: 'border-box',
-          backgroundColor: '#004d40',
-          color: '#ffffff',
-          transition: 'width 0.3s ease-in-out',
-        },
-      }}
-    >
-      <Box sx={{ overflow: 'auto' }}>
-        <IconButton onClick={handleToggle} sx={{ color: '#ffffff', margin: '10px' }}>
-          {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-        </IconButton>
-        <List>
-          {menuItems.map((item, index) => (
-            <ListItem 
-              button 
-              key={index} 
-              onClick={() => navigate(item.path)}
-              sx={{
-                '&:hover': {
-                  backgroundColor: '#00695c',
-                  transition: 'background-color 0.2s ease-in-out',
-                },
-              }}
-            >
-              <ListItemIcon sx={{ color: '#ffffff', minWidth: open ? 40 : 70 }}>
-                {item.icon}
-              </ListItemIcon>
-              <Collapse in={open} timeout="auto" unmountOnExit>
-                <ListItemText 
-                  primary={item.text} 
-                  sx={{ 
-                    '& .MuiListItemText-primary': { 
-                      fontWeight: 'bold', 
-                      whiteSpace: 'nowrap' 
-                    } 
-                  }} 
-                />
-              </Collapse>
-            </ListItem>
-          ))}
-        </List>
+    <StyledDrawer variant="permanent" open={open}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', p: theme.spacing(2) }}>
+        <Logo src={logo} />
+        <Collapse in={open} timeout="auto" unmountOnExit>
+          <Typography variant="h5" sx={{ fontWeight: 'bold', mt: 1, color: '#ffffff' }}>
+            Pharma Insight
+          </Typography>
+        </Collapse>
       </Box>
-    </Drawer>
+      <IconButton
+        onClick={handleToggle}
+        sx={{
+          alignSelf: 'flex-end',
+          mr: 1,
+          color: '#ffffff',
+          '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.08)',
+          },
+        }}
+      >
+        {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+      </IconButton>
+      <List>
+        {menuItems.map((item, index) => (
+          <StyledListItem
+            button
+            key={index}
+            onClick={() => navigate(item.path)}
+            active={location.pathname === item.path}
+          >
+            <StyledListItemIcon>
+              {item.icon}
+            </StyledListItemIcon>
+            <Collapse in={open} timeout="auto" unmountOnExit>
+              <StyledListItemText primary={item.text} />
+            </Collapse>
+          </StyledListItem>
+        ))}
+      </List>
+    </StyledDrawer>
   );
 };
 

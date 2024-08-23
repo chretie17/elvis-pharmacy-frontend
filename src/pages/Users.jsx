@@ -2,16 +2,19 @@ import React, { useState, useEffect } from 'react';
 import {
   Button, Paper, Table, TableHead, TableRow, TableCell, TableBody,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField, MenuItem,
-  Snackbar, Alert, Typography, Box
+  Snackbar, Alert, Typography, Box, IconButton
 } from '@mui/material';
 import { styled } from '@mui/system';
-import api from '../Api'; // Import the configured axios instance
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+import api from '../Api';
 
 const roles = ['Admin', 'Pharmacist', 'Inventory Manager'];
 
 const Container = styled(Box)(({ theme }) => ({
   padding: theme?.spacing(3) || '24px',
-  backgroundColor: '#ffffff', // White background
+  backgroundColor: '#e0f2f1', // Light teal background
   minHeight: '100vh',
   display: 'flex',
   flexDirection: 'column',
@@ -20,26 +23,43 @@ const Container = styled(Box)(({ theme }) => ({
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   width: '100%',
-  maxWidth: '900px',
+  maxWidth: '1000px',
   marginTop: theme?.spacing(3) || '24px',
-  padding: theme?.spacing(2) || '16px',
-  boxShadow: theme?.shadows?.[3] || '0px 1px 3px rgba(0, 0, 0, 0.2)',
-  borderRadius: '8px',
-  backgroundColor: '#e8f5e9', // Light green background for Paper
+  padding: theme?.spacing(3) || '24px',
+  boxShadow: '0 8px 32px rgba(0, 77, 64, 0.1)',
+  borderRadius: '16px',
+  backgroundColor: '#ffffff',
+  overflow: 'hidden',
 }));
 
 const StyledButton = styled(Button)(({ theme }) => ({
-  backgroundColor: '#4CAF50', // Pharmacy green
+  backgroundColor: '#004d40',
   color: '#fff',
   '&:hover': {
-    backgroundColor: '#388E3C', // Darker green on hover
+    backgroundColor: '#00695c',
   },
   marginBottom: theme?.spacing(2) || '16px',
+  padding: '10px 20px',
+  borderRadius: '8px',
+  fontWeight: 'bold',
+  boxShadow: '0 4px 6px rgba(0, 77, 64, 0.1)',
+  transition: 'all 0.3s ease',
 }));
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  color: '#333', // Dark text
+  color: '#004d40',
   fontWeight: 'bold',
+  borderBottom: '2px solid #004d40',
+}));
+
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
+  '&:nth-of-type(odd)': {
+    backgroundColor: '#e0f2f1',
+  },
+  '&:hover': {
+    backgroundColor: '#b2dfdb',
+  },
+  transition: 'background-color 0.3s ease',
 }));
 
 export default function Users() {
@@ -141,13 +161,13 @@ export default function Users() {
 
   return (
     <Container>
-      <Typography variant="h4" gutterBottom color="primary" fontWeight="bold">
+      <Typography variant="h3" gutterBottom color="#004d40" fontWeight="bold" textAlign="center">
         Manage Users
       </Typography>
-      <StyledButton variant="contained" onClick={handleOpen}>
-        Add User
+      <StyledButton variant="contained" onClick={handleOpen} startIcon={<AddCircleIcon />}>
+        Add New User
       </StyledButton>
-      <StyledPaper>
+      <StyledPaper elevation={3}>
         <Table>
           <TableHead>
             <TableRow>
@@ -155,41 +175,53 @@ export default function Users() {
               <StyledTableCell>Username</StyledTableCell>
               <StyledTableCell>Email</StyledTableCell>
               <StyledTableCell>Role</StyledTableCell>
-              <StyledTableCell>Actions</StyledTableCell>
+              <StyledTableCell align="center">Actions</StyledTableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {users.map((user) => (
-              <TableRow key={user.id}>
+              <StyledTableRow key={user.id}>
                 <TableCell>{user.id}</TableCell>
                 <TableCell>{user.username}</TableCell>
                 <TableCell>{user.email}</TableCell>
                 <TableCell>{user.role}</TableCell>
-                <TableCell>
-                  <Button
-                    variant="contained"
-                    color="primary"
+                <TableCell align="center">
+                  <IconButton
                     onClick={() => handleEdit(user)}
+                    color="primary"
                     sx={{ mr: 1 }}
                   >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="secondary"
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
                     onClick={() => handleDelete(user.id)}
+                    color="secondary"
                   >
-                    Delete
-                  </Button>
+                    <DeleteIcon />
+                  </IconButton>
                 </TableCell>
-              </TableRow>
+              </StyledTableRow>
             ))}
           </TableBody>
         </Table>
       </StyledPaper>
 
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-        <DialogTitle>{isEdit ? 'Edit User' : 'Add User'}</DialogTitle>
+      <Dialog 
+        open={open} 
+        onClose={handleClose} 
+        fullWidth 
+        maxWidth="sm"
+        PaperProps={{
+          style: {
+            borderRadius: '16px',
+            padding: '16px',
+            backgroundColor: '#e0f2f1',
+          }
+        }}
+      >
+        <DialogTitle sx={{ color: '#004d40', fontWeight: 'bold' }}>
+          {isEdit ? 'Edit User' : 'Add New User'}
+        </DialogTitle>
         <DialogContent>
           <TextField
             label="Username"
@@ -198,6 +230,23 @@ export default function Users() {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            variant="outlined"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#004d40',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#00695c',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#004d40',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#004d40',
+              },
+            }}
           />
           <TextField
             label="Email"
@@ -206,6 +255,23 @@ export default function Users() {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            variant="outlined"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#004d40',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#00695c',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#004d40',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#004d40',
+              },
+            }}
           />
           {!isEdit && (
             <TextField
@@ -216,6 +282,23 @@ export default function Users() {
               onChange={handleChange}
               fullWidth
               margin="normal"
+              variant="outlined"
+              sx={{
+                '& .MuiOutlinedInput-root': {
+                  '& fieldset': {
+                    borderColor: '#004d40',
+                  },
+                  '&:hover fieldset': {
+                    borderColor: '#00695c',
+                  },
+                  '&.Mui-focused fieldset': {
+                    borderColor: '#004d40',
+                  },
+                },
+                '& .MuiInputLabel-root': {
+                  color: '#004d40',
+                },
+              }}
             />
           )}
           <TextField
@@ -226,6 +309,23 @@ export default function Users() {
             onChange={handleChange}
             fullWidth
             margin="normal"
+            variant="outlined"
+            sx={{
+              '& .MuiOutlinedInput-root': {
+                '& fieldset': {
+                  borderColor: '#004d40',
+                },
+                '&:hover fieldset': {
+                  borderColor: '#00695c',
+                },
+                '&.Mui-focused fieldset': {
+                  borderColor: '#004d40',
+                },
+              },
+              '& .MuiInputLabel-root': {
+                color: '#004d40',
+              },
+            }}
           >
             {roles.map((role) => (
               <MenuItem key={role} value={role}>
@@ -235,10 +335,19 @@ export default function Users() {
           </TextField>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} color="secondary">
+          <Button onClick={handleClose} sx={{ color: '#004d40' }}>
             Cancel
           </Button>
-          <Button onClick={handleSave} color="primary">
+          <Button 
+            onClick={handleSave} 
+            variant="contained"
+            sx={{ 
+              backgroundColor: '#004d40',
+              '&:hover': {
+                backgroundColor: '#00695c',
+              }
+            }}
+          >
             {isEdit ? 'Update' : 'Save'}
           </Button>
         </DialogActions>
@@ -248,8 +357,20 @@ export default function Users() {
         open={snackbarOpen}
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert 
+          onClose={handleSnackbarClose} 
+          severity={snackbarSeverity} 
+          sx={{ 
+            width: '100%',
+            backgroundColor: '#004d40',
+            color: 'white',
+            '& .MuiAlert-icon': {
+              color: 'white',
+            }
+          }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
