@@ -11,6 +11,8 @@ import AllPatients from './pages/Patients';
 import AllPharmacists from './pages/Pharmacists';
 import FinancialReport from './pages/Financial';
 import Compliance from './pages/Compliance';
+import ThankYou from './pages/ThankYou';
+import ManageSuppliers  from './pages/Suppliers';
 import PharmacistDashboard from './pages/PharmacyDash';
 import { AuthProvider, AuthContext } from './contexts/AuthContext';
 
@@ -20,6 +22,8 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/thank-you" element={<ThankYou />} />
+
           <Route
             path="/"
             element={
@@ -36,6 +40,16 @@ function App() {
               <PrivateRoute>
                 <Layout>
                   <Dashboard />
+                </Layout>
+              </PrivateRoute>
+            }
+          />
+             <Route
+            path="/suppliers"
+            element={
+              <PrivateRoute>
+                <Layout>
+                  <ManageSuppliers />
                 </Layout>
               </PrivateRoute>
             }

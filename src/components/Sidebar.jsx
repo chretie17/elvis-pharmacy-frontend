@@ -103,6 +103,7 @@ const Sidebar = () => {
     { text: 'Users', icon: <People />, path: '/users' },
     { text: 'Inventory', icon: <Inventory />, path: '/inventory' },
     { text: 'Orders', icon: <ShoppingCart />, path: '/orders' },
+    { text: 'Suppliers', icon: <ShoppingCart />, path: '/suppliers' },
     { text: 'Patients', icon: <LocalPharmacy />, path: '/patients' },
     { text: 'Pharmacists', icon: <Assignment />, path: '/pharmacists' },
     { text: 'Financial Reports', icon: <AccountBalance />, path: '/financial' },
